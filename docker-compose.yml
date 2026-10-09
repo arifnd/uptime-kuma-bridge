@@ -1,0 +1,31 @@
+services:
+  bridge:
+    build: .
+    image: uptime-kuma-bridge:local
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Point at your Uptime Kuma instance.
+      UK_BASE_URL: http://uptime-kuma:3001
+      UK_USERNAME: ${UK_USERNAME:-admin}
+      UK_PASSWORD: ${UK_PASSWORD:?set UK_PASSWORD}
+      # Or use a remember-me JWT instead of username/password:
+      # UK_JWT_TOKEN: ${UK_JWT_TOKEN}
+      BRIDGE_API_KEYS: ${BRIDGE_API_KEYS:-}
+      BRIDGE_ALLOW_ANONYMOUS: ${BRIDGE_ALLOW_ANONYMOUS:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    # Single worker is REQUIRED: the state store and event bus are in-memory.
+    command: uptime-kuma-bridge
+
+  # Uncomment to run Uptime Kuma alongside the bridge.
+  # uptime-kuma:
+  #   image: louislam/uptime-kuma:2
+  #   restart: unless-stopped
+  #   volumes:
+  #     - uptime-kuma-data:/app/data
+  #   ports:
+  #     - "3001:3001"
+
+# volumes:
+#   uptime-kuma-data:
